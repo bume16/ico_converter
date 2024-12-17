@@ -166,14 +166,12 @@ class ICO_CNVER(TkinterDnD.Tk):
         self.minsize(360,160)
         self.maxsize(360,160)
 
-        self.iconbitmap("./resource/icon_cnver.ico")
+        self.iconbitmap("icon_cnver.ico")
 
         self.style = ttk.Style(theme="solar")  # 다른 테마로 변경 가능
         
         self.initDragAndDropZone()
         self.initPreviewImageView()
-
-        # self.convPNGtoICO("./resource/space-station.png")
 
         # APP 실행
         self.mainloop()
