@@ -1,4 +1,4 @@
-import os
+import sys,os
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
@@ -12,6 +12,7 @@ class ICO_CNVER(TkinterDnD.Tk):
     1. 이미지 입력 ZONE에 이미지를 끌어다 놓는다.
     2. ICO 파일이 이미지 파일과 같은 경로에 생성된다. 
     """
+
     def __init__(self, config):
         """
         프로그램 초기화 초기화 메소드
@@ -52,6 +53,15 @@ class ICO_CNVER(TkinterDnD.Tk):
         self.dnd_label.dnd_bind('<<Drop>>', self.on_drop)
 
     def initPreviewImageView(self):
+        """
+        이미지 미리보기 컨트롤 설정 메소드
+        
+        입력된 이미지 파일을 표시할 컨트롤을 설정한다.
+
+        Args:
+            self (ICO_CONVERTER Object)
+        Returns:
+        """
         # image view
         self.image_label = ttk.Label(
             self, 
@@ -126,7 +136,6 @@ class ICO_CNVER(TkinterDnD.Tk):
             self.showImageLoadingError("Please drop only one file.")
         else:
             file_path = files[0]
-            print(file_path)
 
             if not file_path.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
                 self.showImageLoadingError("Invalid file type.\r\nPlease drop an image.")
@@ -134,7 +143,7 @@ class ICO_CNVER(TkinterDnD.Tk):
             
             self.displayImage(self.image_label, file_path=file_path)
             self.convertICO(file_path)
-            
+      
     @staticmethod
     def split_files(file_string):
         """
@@ -153,6 +162,24 @@ class ICO_CNVER(TkinterDnD.Tk):
         # 여러 파일이 드래그된 경우 처리
         return file_string.split()
     
+    @staticmethod    
+    def get_resource_path(relative_path):
+        """
+        PyInstaller에서 리소스 파일의 경로를 가져오는 함수
+
+        Args:
+            실제파일 경로(string)
+        Returns:
+            패키징된 파일 경로(string)
+        """
+        # PyInstaller로 패키징된 경우
+        if hasattr(sys, '_MEIPASS'):
+            return os.path.join(sys._MEIPASS, relative_path)
+        # 개발 환경에서 실행되는 경우
+        else:
+            return os.path.join(os.path.abspath("."), relative_path)      
+
+    
     def run(self):
         """
         앱 실행 메소드
@@ -166,7 +193,7 @@ class ICO_CNVER(TkinterDnD.Tk):
         self.minsize(360,160)
         self.maxsize(360,160)
 
-        self.iconbitmap("icon_cnver.ico")
+        self.iconbitmap(self.get_resource_path("res/icon_cnver.ico"))
 
         self.style = ttk.Style(theme="solar")  # 다른 테마로 변경 가능
         
@@ -190,7 +217,9 @@ class ICO_CNVER(TkinterDnD.Tk):
         img = Image.open(path)
         img.save(f"{directory}\\{base_name}.ico", format="ICO", sizes=[(16, 16), (32, 32), (48, 48), (64, 64), (128, 128), (256, 256)])
 
+
 if __name__ == "__main__":
     config = {"debug": True, "version": "0.0.1"}  # 설정 값
     app = ICO_CNVER(config)
     app.run()
+
